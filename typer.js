@@ -1,18 +1,20 @@
-String.prototype.typeOut = function(output, speed) {
+Node.prototype.typeOut = function() {
 
-	this.characters = this.split('');
+	if (typeof arguments[0] === 'string') {
+		var string = arguments[0];
+		var speed = arguments[1];
+	} else {
+		var string = this.innerText;
+		var speed = arguments[0];
+	}
+
+	this.characters = string.split('');
 
 	/**
 	 * The speed at which to run the timeouts
 	 * @type {integer}
 	 */
 	this.speed = speed || 100;
-
-	/**
-	 * Where the text will be rendered to
-	 * @type {HTMLElement}
-	 */
-	this.container = document.getElementById(output.replace('#', ''));
 
 	/**
 	 * The cursor element
@@ -26,6 +28,10 @@ String.prototype.typeOut = function(output, speed) {
 	// Self referencing for closure
 	var self = this;
 
+	this.innerText = '';
+
+	self.appendChild(self.cursor);
+
 	for (var index = 0; index < this.characters.length; index++) {
 
 		// Replace new lines with BR element
@@ -34,33 +40,21 @@ String.prototype.typeOut = function(output, speed) {
 		(function (index) {
 			setTimeout(function () {
 
-				// Check if cursor exists
-				// If so then remove
-				if (cursorExists()) {
-					self.container.removeChild(self.cursor);
-				}
+				self.removeChild(self.cursor);
 
 				// Append the character to the container
-				self.container.innerHTML += self.characters[index];
+				self.innerHTML += self.characters[index];
 
 				// Add the cursor
-				self.container.appendChild(self.cursor);
+				self.appendChild(self.cursor);
 
 				// If we have reached the end, remove the cursor
 				if (index == self.characters.length - 1) {
-					self.container.removeChild(self.cursor);
+					self.removeChild(self.cursor);
 				}
 			}, self.speed * index);
 		})(index);
 
-	}	
-
-	/** 
-	 * Check if cursor exists in document
-	 * @return {HTMLElement || Boolean}
-	 */
-	function cursorExists () {
-		return document.getElementById('typeout-cursor');
 	}
 
 }
